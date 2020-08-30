@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import Header from './components/Header'
 import PizzaForm from './components/PizzaForm'
 import PizzaList from './containers/PizzaList'
-var URL = 'http://localhost:3000/pizzas'
+var URL = 'http://localhost:3000/pizzas/'
 
 
 class App extends Component {
@@ -33,7 +33,7 @@ class App extends Component {
       )
     })
 
-    this.setState({selectedPizza : pizza},() => console.log(this.state.selectedPizza))
+    this.setState({selectedPizza : pizza})
   }
 
   changeTopping = (event) => {
@@ -42,7 +42,7 @@ class App extends Component {
         ...this.state.selectedPizza, 
         topping: event.target.value
       }
-    },() => console.log(this.state.selectedPizza.topping))
+    })
   }
 
   changeSize = (event) => {
@@ -51,7 +51,7 @@ class App extends Component {
         ...this.state.selectedPizza, 
         size: event.target.value
       }
-    }, () => console.log(this.state.selectedPizza.size))
+    })
   }
 
   changeVegetarian = (event) => {
@@ -61,19 +61,36 @@ class App extends Component {
           ...this.state.selectedPizza, 
           vegetarian: true
         }
-      },() => console.log(this.state.selectedPizza.vegetarian))
+      })
     } else {
       this.setState(
         {selectedPizza: {
           ...this.state.selectedPizza, 
           vegetarian: false
         }
-      },() => console.log(this.state.selectedPizza.vegetarian))
+      })
     }
+  }
+
+  patchPizzas = () => {
+
+    const configObj = {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(this.state.selectedPizza)
+    }
+
+    fetch(URL + (this.state.selectedPizza.id),configObj)
+      .then(response => response.json())
+      .then(pizza => console.log(pizza))
   }
 
   updatePizza = () => {
     this.state.pizzas[this.state.selectedPizza.id - 1] = this.state.selectedPizza
+
+    this.patchPizzas()
 
     this.setState({pizzas: this.state.pizzas,
                   selectedPizza:null})
